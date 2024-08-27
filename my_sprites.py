@@ -81,3 +81,32 @@ class PlayerShot(arcade.Sprite):
         # Remove shot when over top of screen
         if self.bottom > self.max_y_pos:
             self.kill()
+
+class Balloons(arcade.Sprite):
+    def __init__(self, center_x, center_y, screen_width, angle, player_speed, scale=1,):
+        """
+        Setup new PlayerShot object
+        """
+
+        # Set the graphics to use for the sprite
+        super().__init__(
+            center_x=center_x,
+            center_y=center_y,
+            scale=scale,
+            filename="images/Lasers/laserBlue01.png",
+            flipped_diagonally=True,
+            flipped_horizontally=True,
+            flipped_vertically=False,
+        )
+
+        self.angle = angle
+
+        self.screen_width = screen_width
+
+        self.player_speed = player_speed
+    def update(self):
+        if self.center_x > self.screen_width:
+            self.center_x = 0
+        if self.center_x < 0:
+            self.center_x = self.screen_width
+        self.center_x += self.player_speed * 4

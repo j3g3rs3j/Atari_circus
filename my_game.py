@@ -10,7 +10,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 
 # Import sprites from local file my_sprites.py
-from my_sprites import Player, PlayerShot
+from my_sprites import Player, PlayerShot, Balloons
 
 # Set the scaling of all sprites in the game
 SPRITE_SCALING = 0.5
@@ -25,6 +25,10 @@ PLAYER_SPEED_X = 200
 PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = 50
 PLAYER_SHOT_SPEED = 300
+
+#variables controling the balloons
+NUMBER_OF_BLOONS = 10
+NUMBER_OF_ROWS = 2
 
 FIRE_KEY = arcade.key.SPACE
 
@@ -41,6 +45,9 @@ class GameView(arcade.View):
 
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = arcade.SpriteList()
+
+        # Variable that will hold a list of shots fired by the player
+        self.balloons_list = arcade.SpriteList()
 
         # Set up the player info
         self.player_score = 0
@@ -84,7 +91,7 @@ class GameView(arcade.View):
             self.joystick = None
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.BLACK)
 
     def on_draw(self):
         """
@@ -96,6 +103,9 @@ class GameView(arcade.View):
 
         # Draw the player shot
         self.player_shot_list.draw()
+
+        #draw the balloons
+        self.balloons_list.draw()
 
         # Draw the player sprite
         self.player.draw()
@@ -132,19 +142,50 @@ class GameView(arcade.View):
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
 
-        # The game is over when the player scores a 100 points
-        if self.player_score >= 100:
+        self.balloons_list.update()
+
+        # The game is over when the player scores 1000000 points
+        if self.player_score >= 1000000:
             self.game_over()
+
+        #creates new balloons when no more balloons is in the sprite list
+        if len(self.balloons_list) < 1:
+            for r in range(NUMBER_OF_ROWS):
+                if r%2 == 1:
+                    for i in range(NUMBER_OF_BLOONS):
+                        self.balloons_list.append(
+                            Balloons(
+                                center_x=SCREEN_WIDTH - SCREEN_WIDTH / NUMBER_OF_BLOONS * i,
+                                center_y=SCREEN_HEIGHT - (r+1)*40,
+                                screen_width=SCREEN_WIDTH,
+                                angle=0,
+                                player_speed=1))
+                else:
+                    for i in range(NUMBER_OF_BLOONS):
+                        self.balloons_list.append(
+                            Balloons(
+                                center_x=0 + SCREEN_WIDTH / NUMBER_OF_BLOONS * i,
+                                center_y=SCREEN_HEIGHT - (r+1)*40,
+                                screen_width=SCREEN_WIDTH,
+                                angle=180,
+                                player_speed=-1))
+
+
+
+        for b in self.balloons_list:
+            for s in self.player_shot_list:
+                if arcade.check_for_collision(b, s):
+                    b.kill()
 
     def game_over(self):
         """
         Call this when the game is over
         """
 
-        # Create a game over view
+        # Create a game overview
         game_over_view = GameOverView(score=self.player_score)
 
-        # Change to game over view
+        # Change to game overview
         self.window.show_view(game_over_view)
 
     def on_key_press(self, key, modifiers):
