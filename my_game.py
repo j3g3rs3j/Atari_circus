@@ -27,8 +27,8 @@ PLAYER_START_Y = 50
 PLAYER_SHOT_SPEED = 300
 
 #variables controling the balloons
-NUMBER_OF_BLOONS = 10
-NUMBER_OF_ROWS = 2
+NUMBER_OF_BALLOONS = 10
+NUMBER_OF_ROWS = 4
 
 FIRE_KEY = arcade.key.SPACE
 
@@ -46,8 +46,8 @@ class GameView(arcade.View):
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = arcade.SpriteList()
 
-        # Variable that will hold a list of shots fired by the player
-        self.balloons_list = arcade.SpriteList()
+        # List that will hold a list of bloons
+        self.balloons_list = []
 
         # Set up the player info
         self.player_score = 0
@@ -61,6 +61,14 @@ class GameView(arcade.View):
             max_x_pos=SCREEN_WIDTH,
             scale=SPRITE_SCALING,
         )
+
+        self.balloons_list = self.get_balloons_list(
+            rows=NUMBER_OF_ROWS,
+            row_lengh=NUMBER_OF_BALLOONS,
+            screen_width=SCREEN_WIDTH,
+            screen_height=SCREEN_HEIGHT
+        )
+
 
         # Track the current state of what keys are pressed
         self.left_pressed = False
@@ -105,10 +113,12 @@ class GameView(arcade.View):
         self.player_shot_list.draw()
 
         #draw the balloons
-        self.balloons_list.draw()
+        for bl in self.balloons_list:
+            bl.draw()
 
         # Draw the player sprite
         self.player.draw()
+
 
         # Draw players score on screen
         arcade.draw_text(
@@ -117,12 +127,29 @@ class GameView(arcade.View):
             SCREEN_HEIGHT - 20,  # Y positon
             arcade.color.WHITE,  # Color of text
         )
+    def get_balloons_list(self, rows, row_lengh, screen_width, screen_height):
+        balloons = []
+
+        for row_number in range(rows):
+            balloons.append(arcade.SpriteList())
+            for i in range(row_lengh):
+                balloons[row_number].append(
+                    Balloons(
+                        center_x=screen_width - screen_width / row_lengh * i,
+                        center_y=screen_height - (row_number+1)*40,
+                        screen_width=screen_width,
+                        angle=0,
+                        player_speed=1
+                    )
+                )
+
+        return balloons
+
 
     def on_update(self, delta_time):
         """
         Movement and game logic
         """
-
         # Calculate player speed based on the keys pressed
         self.player.change_x = 0
 
@@ -142,40 +169,17 @@ class GameView(arcade.View):
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
 
-        self.balloons_list.update()
+        # update balloon list
+        for bl in self.balloons_list:
+            bl.update()
 
-        # The game is over when the player scores 1000000 points
+        # The game is over when the player scores a 100 points
         if self.player_score >= 1000000:
             self.game_over()
 
         #creates new balloons when no more balloons is in the sprite list
-        if len(self.balloons_list) < 1:
-            for r in range(NUMBER_OF_ROWS):
-                if r%2 == 1:
-                    for i in range(NUMBER_OF_BLOONS):
-                        self.balloons_list.append(
-                            Balloons(
-                                center_x=SCREEN_WIDTH - SCREEN_WIDTH / NUMBER_OF_BLOONS * i,
-                                center_y=SCREEN_HEIGHT - (r+1)*40,
-                                screen_width=SCREEN_WIDTH,
-                                angle=0,
-                                player_speed=1))
-                else:
-                    for i in range(NUMBER_OF_BLOONS):
-                        self.balloons_list.append(
-                            Balloons(
-                                center_x=0 + SCREEN_WIDTH / NUMBER_OF_BLOONS * i,
-                                center_y=SCREEN_HEIGHT - (r+1)*40,
-                                screen_width=SCREEN_WIDTH,
-                                angle=180,
-                                player_speed=-1))
 
 
-
-        for b in self.balloons_list:
-            for s in self.player_shot_list:
-                if arcade.check_for_collision(b, s):
-                    b.kill()
 
     def game_over(self):
         """
