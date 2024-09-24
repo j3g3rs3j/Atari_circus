@@ -24,6 +24,8 @@ PLAYER_LIVES = 3
 PLAYER_SPEED_X = 200
 PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = 50
+
+#variables controlling the playershot
 PLAYER_SHOT_SPEED = 300
 
 #variables controling the balloons
@@ -32,6 +34,7 @@ NUMBER_OF_ROWS = 4
 BALLON_SPEED = 100
 
 FIRE_KEY = arcade.key.SPACE
+
 
 
 class GameView(arcade.View):
@@ -192,7 +195,7 @@ class GameView(arcade.View):
         for bl in self.balloons_list:
             bl.update()
 
-        # The game is over when the player scores a 100 points
+        # The game is over when the player scores 100 points
         if self.player_score >= 1000000:
             self.game_over()
 
@@ -245,6 +248,12 @@ class GameView(arcade.View):
 
             # Add the new shot to the list of shots
             self.player_shot_list.append(new_shot)
+
+            self.physics_engine.add_sprite(
+                sprite=self.player_shot_list[-1],
+                gravity=(0, 0)
+            )
+            self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
 
     def on_key_release(self, key, modifiers):
         """

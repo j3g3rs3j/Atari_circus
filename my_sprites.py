@@ -66,17 +66,10 @@ class PlayerShot(arcade.Sprite):
         # Shoot points in this direction
         self.angle = start_angle
 
-        # Shot moves forward. Sets self.change_x and self.change_y
-        self.forward(speed)
-
     def on_update(self, delta_time):
         """
         Move the sprite
         """
-
-        # Update the position of the sprite
-        self.center_x += delta_time * self.change_x
-        self.center_y += delta_time * self.change_y
 
         # Remove shot when over top of screen
         if self.bottom > self.max_y_pos:
