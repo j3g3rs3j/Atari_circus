@@ -66,18 +66,41 @@ class PlayerShot(arcade.Sprite):
         # Shoot points in this direction
         self.angle = start_angle
 
-        # Shot moves forward. Sets self.change_x and self.change_y
-        self.forward(speed)
-
     def on_update(self, delta_time):
         """
         Move the sprite
         """
 
-        # Update the position of the sprite
-        self.center_x += delta_time * self.change_x
-        self.center_y += delta_time * self.change_y
-
         # Remove shot when over top of screen
         if self.bottom > self.max_y_pos:
             self.kill()
+
+class Balloons(arcade.Sprite):
+    def __init__(self, center_x, center_y, screen_width, angle, scale=1, physics_engine=arcade.pymunk_physics_engine):
+        """
+        Setup new PlayerShot object
+        """
+
+        # Set the graphics to use for the sprite
+        super().__init__(
+            center_x=center_x,
+            center_y=center_y,
+            scale=scale,
+            filename="images/Power-ups/powerupBlue.png",
+            flipped_diagonally=True,
+            flipped_horizontally=True,
+            flipped_vertically=False,
+        )
+
+        self.angle = angle
+
+        self.screen_width = screen_width
+
+        self.physics_engine = physics_engine
+
+    def update(self):
+
+        if self.center_x > self.screen_width:
+            self.physics_engine.set_position(self, (0, self.center_y))
+        if self.center_x < 0:
+            self.physics_engine.set_position(self, (self.screen_width, self.center_y))

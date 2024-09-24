@@ -10,7 +10,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 
 # Import sprites from local file my_sprites.py
-from my_sprites import Player, PlayerShot
+from my_sprites import Player, PlayerShot, Balloons
 
 # Set the scaling of all sprites in the game
 SPRITE_SCALING = 0.5
@@ -24,9 +24,17 @@ PLAYER_LIVES = 3
 PLAYER_SPEED_X = 200
 PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = 50
+
+#variables controlling the playershot
 PLAYER_SHOT_SPEED = 300
 
+#variables controling the balloons
+NUMBER_OF_BALLOONS = 10
+NUMBER_OF_ROWS = 4
+BALLON_SPEED = 100
+
 FIRE_KEY = arcade.key.SPACE
+
 
 
 class GameView(arcade.View):
@@ -39,8 +47,17 @@ class GameView(arcade.View):
         This is run once when we switch to this view
         """
 
+
+        # creates a physicsengine
+        self.physics_engine = arcade.PymunkPhysicsEngine(
+            gravity=(0, -30),
+        )
+
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = arcade.SpriteList()
+
+        # List that will hold a list of bloons
+        self.balloons_list = []
 
         # Set up the player info
         self.player_score = 0
@@ -54,6 +71,14 @@ class GameView(arcade.View):
             max_x_pos=SCREEN_WIDTH,
             scale=SPRITE_SCALING,
         )
+
+        self.balloons_list = self.get_balloons_list(
+            rows=NUMBER_OF_ROWS,
+            row_lengh=NUMBER_OF_BALLOONS,
+            screen_width=SCREEN_WIDTH,
+            screen_height=SCREEN_HEIGHT
+        )
+
 
         # Track the current state of what keys are pressed
         self.left_pressed = False
@@ -84,7 +109,15 @@ class GameView(arcade.View):
             self.joystick = None
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.BLACK)
+
+        for r in self.balloons_list:
+            for b in r:
+                self.physics_engine.add_sprite(
+                    sprite=b,
+                    gravity=(0, 0)
+                )
+                self.physics_engine.set_velocity(b,(BALLON_SPEED, 0))
 
     def on_draw(self):
         """
@@ -97,8 +130,13 @@ class GameView(arcade.View):
         # Draw the player shot
         self.player_shot_list.draw()
 
+        #draw the balloons
+        for bl in self.balloons_list:
+            bl.draw()
+
         # Draw the player sprite
         self.player.draw()
+
 
         # Draw players score on screen
         arcade.draw_text(
@@ -107,12 +145,29 @@ class GameView(arcade.View):
             SCREEN_HEIGHT - 20,  # Y positon
             arcade.color.WHITE,  # Color of text
         )
+    def get_balloons_list(self, rows, row_lengh, screen_width, screen_height):
+        balloons = []
+
+        for row_number in range(rows):
+            balloons.append(arcade.SpriteList())
+            for i in range(row_lengh):
+                balloons[row_number].append(
+                    Balloons(
+                        center_x=screen_width - screen_width / row_lengh * i,
+                        center_y=screen_height - (row_number+1)*40,
+                        screen_width=screen_width,
+                        angle=0,
+                        physics_engine=self.physics_engine
+                    )
+                )
+
+        return balloons
+
 
     def on_update(self, delta_time):
         """
         Movement and game logic
         """
-
         # Calculate player speed based on the keys pressed
         self.player.change_x = 0
 
@@ -132,19 +187,31 @@ class GameView(arcade.View):
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
 
-        # The game is over when the player scores a 100 points
-        if self.player_score >= 100:
+
+        self.physics_engine.step()
+
+
+        # update balloon list
+        for bl in self.balloons_list:
+            bl.update()
+
+        # The game is over when the player scores 100 points
+        if self.player_score >= 1000000:
             self.game_over()
+
+        #creates new balloons when no more balloons is in the sprite list
+
+
 
     def game_over(self):
         """
         Call this when the game is over
         """
 
-        # Create a game over view
+        # Create a game overview
         game_over_view = GameOverView(score=self.player_score)
 
-        # Change to game over view
+        # Change to game overview
         self.window.show_view(game_over_view)
 
     def on_key_press(self, key, modifiers):
@@ -181,6 +248,12 @@ class GameView(arcade.View):
 
             # Add the new shot to the list of shots
             self.player_shot_list.append(new_shot)
+
+            self.physics_engine.add_sprite(
+                sprite=self.player_shot_list[-1],
+                gravity=(0, 0)
+            )
+            self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
 
     def on_key_release(self, key, modifiers):
         """
