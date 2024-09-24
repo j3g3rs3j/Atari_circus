@@ -29,6 +29,7 @@ PLAYER_SHOT_SPEED = 300
 #variables controling the balloons
 NUMBER_OF_BALLOONS = 10
 NUMBER_OF_ROWS = 4
+BALLON_SPEED = 100
 
 FIRE_KEY = arcade.key.SPACE
 
@@ -42,6 +43,12 @@ class GameView(arcade.View):
         """
         This is run once when we switch to this view
         """
+
+
+        # creates a physicsengine
+        self.physics_engine = arcade.PymunkPhysicsEngine(
+            gravity=(0, -30),
+        )
 
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = arcade.SpriteList()
@@ -101,6 +108,14 @@ class GameView(arcade.View):
         # Set the background color
         arcade.set_background_color(arcade.color.BLACK)
 
+        for r in self.balloons_list:
+            for b in r:
+                self.physics_engine.add_sprite(
+                    sprite=b,
+                    gravity=(0, 0)
+                )
+                self.physics_engine.set_velocity(b,(BALLON_SPEED, 0))
+
     def on_draw(self):
         """
         Render the screen.
@@ -139,7 +154,7 @@ class GameView(arcade.View):
                         center_y=screen_height - (row_number+1)*40,
                         screen_width=screen_width,
                         angle=0,
-                        player_speed=1
+                        physics_engine=self.physics_engine
                     )
                 )
 
@@ -168,6 +183,10 @@ class GameView(arcade.View):
 
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
+
+
+        self.physics_engine.step()
+
 
         # update balloon list
         for bl in self.balloons_list:

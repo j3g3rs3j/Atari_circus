@@ -83,7 +83,7 @@ class PlayerShot(arcade.Sprite):
             self.kill()
 
 class Balloons(arcade.Sprite):
-    def __init__(self, center_x, center_y, screen_width, angle, player_speed, scale=1,):
+    def __init__(self, center_x, center_y, screen_width, angle, scale=1, physics_engine=arcade.pymunk_physics_engine):
         """
         Setup new PlayerShot object
         """
@@ -103,10 +103,11 @@ class Balloons(arcade.Sprite):
 
         self.screen_width = screen_width
 
-        self.player_speed = player_speed
+        self.physics_engine = physics_engine
+
     def update(self):
+
         if self.center_x > self.screen_width:
-            self.center_x = 0
+            self.physics_engine.set_position(self, (0, self.center_y))
         if self.center_x < 0:
-            self.center_x = self.screen_width
-        self.center_x += self.player_speed * 4
+            self.physics_engine.set_position(self, (self.screen_width, self.center_y))
