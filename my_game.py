@@ -110,14 +110,15 @@ class GameView(arcade.View):
 
         # Set the background color
         arcade.set_background_color(arcade.color.BLACK)
-
+        self.direction = -1
         for r in self.balloons_list:
             for b in r:
                 self.physics_engine.add_sprite(
                     sprite=b,
                     gravity=(0, 0)
                 )
-                self.physics_engine.set_velocity(b,(BALLON_SPEED, 0))
+                self.physics_engine.set_velocity(b,(BALLON_SPEED*self.direction, 0))
+            self.direction *= -1
 
     def on_draw(self):
         """
@@ -157,6 +158,7 @@ class GameView(arcade.View):
                         center_y=screen_height - (row_number+1)*40,
                         screen_width=screen_width,
                         angle=0,
+                        row=row_number % 3,
                         physics_engine=self.physics_engine
                     )
                 )
