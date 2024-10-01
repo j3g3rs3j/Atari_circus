@@ -30,7 +30,7 @@ PLAYER_SHOT_SPEED = 300
 
 #variables controling the balloons
 NUMBER_OF_BALLOONS = 10
-NUMBER_OF_ROWS = 4
+NUMBER_OF_ROWS = 13
 BALLON_SPEED = 100
 
 FIRE_KEY = arcade.key.SPACE
@@ -115,7 +115,8 @@ class GameView(arcade.View):
             for b in r:
                 self.physics_engine.add_sprite(
                     sprite=b,
-                    gravity=(0, 0)
+                    gravity=(0, 0),
+                    collision_type="balloon"
                 )
                 self.physics_engine.set_velocity(b,(BALLON_SPEED*self.direction, 0))
             self.direction *= -1
@@ -165,6 +166,12 @@ class GameView(arcade.View):
 
         return balloons
 
+    def balloon_death(self, balloon, player_shot, arbiter, space, _data):
+
+        balloon.balloon_death_sequence()
+
+
+
 
     def on_update(self, delta_time):
         """
@@ -189,9 +196,15 @@ class GameView(arcade.View):
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
 
-
+        # updates the physics engine
         self.physics_engine.step()
 
+        # collisions between bullets and balloons
+        self.physics_engine.add_collision_handler(
+            first_type="balloon",
+            second_type="shot",
+            post_handler=self.balloon_death
+        )
 
         # update balloon list
         for bl in self.balloons_list:
@@ -253,7 +266,8 @@ class GameView(arcade.View):
 
             self.physics_engine.add_sprite(
                 sprite=self.player_shot_list[-1],
-                gravity=(0, 0)
+                gravity=(0, 0),
+                collision_type="shot"
             )
             self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
 
