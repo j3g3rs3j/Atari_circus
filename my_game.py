@@ -50,7 +50,7 @@ class GameView(arcade.View):
 
         # creates a physicsengine
         self.physics_engine = arcade.PymunkPhysicsEngine(
-            gravity=(0, -30),
+            gravity=(1, -30),
         )
 
         # Variable that will hold a list of shots fired by the player
@@ -210,12 +210,22 @@ class GameView(arcade.View):
         for bl in self.balloons_list:
             bl.update()
 
+        self.no_balloons()
+
         # The game is over when the player scores 100 points
         if self.player_score >= 1000000:
             self.game_over()
 
         #creates new balloons when no more balloons is in the sprite list
 
+    def no_balloons(self):
+
+        self.sum_of_ballons = 0
+
+        for balloonlist in self.balloons_list:
+            self.sum_of_ballons += len(balloonlist)
+        if self.sum_of_ballons <= 0:
+            print("hello world")
 
 
     def game_over(self):
@@ -266,7 +276,7 @@ class GameView(arcade.View):
 
             self.physics_engine.add_sprite(
                 sprite=self.player_shot_list[-1],
-                gravity=(0, 0),
+                gravity=(0, -20),
                 collision_type="shot"
             )
             self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
