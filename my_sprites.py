@@ -76,22 +76,23 @@ class PlayerShot(arcade.Sprite):
             self.kill()
 
 class Balloons(arcade.Sprite):
-    def __init__(self, center_x, center_y, screen_width, angle, scale=1, physics_engine=arcade.pymunk_physics_engine):
+    def __init__(self, center_x, center_y, screen_width, angle, row, scale=1, physics_engine=arcade.pymunk_physics_engine):
         """
         Setup new PlayerShot object
         """
+
+        self.costume_list = ["images/Power-ups/powerupBlue.png", "images/Power-ups/powerupRed.png","images/Power-ups/powerupGreen.png"]
 
         # Set the graphics to use for the sprite
         super().__init__(
             center_x=center_x,
             center_y=center_y,
             scale=scale,
-            filename="images/Power-ups/powerupBlue.png",
+            filename=self.costume_list[row],
             flipped_diagonally=True,
             flipped_horizontally=True,
             flipped_vertically=False,
         )
-
         self.angle = angle
 
         self.screen_width = screen_width
@@ -100,7 +101,14 @@ class Balloons(arcade.Sprite):
 
     def update(self):
 
-        if self.center_x > self.screen_width:
-            self.physics_engine.set_position(self, (0, self.center_y))
-        if self.center_x < 0:
-            self.physics_engine.set_position(self, (self.screen_width, self.center_y))
+        if self.center_x > self.screen_width + 13:
+            self.physics_engine.set_position(self, (-13, self.center_y))
+        if self.center_x < -13:
+            self.physics_engine.set_position(self, (self.screen_width - 13, self.center_y))
+
+    def balloon_death_sequence(self):
+
+
+
+        self.kill()
+
