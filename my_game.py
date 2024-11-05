@@ -155,7 +155,7 @@ class GameView(arcade.View):
             for i in range(row_lengh):
                 balloons[row_number].append(
                     Balloons(
-                        center_x=screen_width - screen_width / row_lengh * i,
+                        center_x=(screen_width + 13) - (screen_width + 13) / row_lengh * i,
                         center_y=screen_height - (row_number+1)*40,
                         screen_width=screen_width,
                         angle=0,

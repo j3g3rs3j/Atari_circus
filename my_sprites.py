@@ -101,10 +101,10 @@ class Balloons(arcade.Sprite):
 
     def update(self):
 
-        if self.center_x > self.screen_width:
-            self.physics_engine.set_position(self, (0, self.center_y))
-        if self.center_x < 0:
-            self.physics_engine.set_position(self, (self.screen_width, self.center_y))
+        if self.center_x > self.screen_width + 13:
+            self.physics_engine.set_position(self, (-13, self.center_y))
+        if self.center_x < -13:
+            self.physics_engine.set_position(self, (self.screen_width - 13, self.center_y))
 
     def balloon_death_sequence(self):
 
