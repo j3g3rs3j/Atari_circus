@@ -38,7 +38,7 @@ class Player(arcade.Sprite):
             self.right = self.max_x_pos
 
 
-class PlayerShot(arcade.Sprite):
+class Acrobat(arcade.Sprite):
     """
     A shot fired by the Player
     """

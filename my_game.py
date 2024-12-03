@@ -10,7 +10,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 
 # Import sprites from local file my_sprites.py
-from my_sprites import Player, PlayerShot, Balloons
+from my_sprites import Player, Acrobat, Balloons
 
 # Set the scaling of all sprites in the game
 SPRITE_SCALING = 0.5
@@ -30,8 +30,8 @@ PLAYER_SHOT_SPEED = 300
 
 #variables controling the balloons
 NUMBER_OF_BALLOONS = 10
-NUMBER_OF_ROWS = 13
-BALLON_SPEED = 100
+NUMBER_OF_ROWS = 4
+BALLON_SPEED = 225
 
 FIRE_KEY = arcade.key.SPACE
 
@@ -263,7 +263,7 @@ class GameView(arcade.View):
             self.player_score += 10
 
             # Create the new shot
-            new_shot = PlayerShot(
+            new_shot = Acrobat(
                 center_x=self.player.center_x,
                 center_y=self.player.center_y,
                 speed=PLAYER_SHOT_SPEED,
@@ -276,8 +276,9 @@ class GameView(arcade.View):
 
             self.physics_engine.add_sprite(
                 sprite=self.player_shot_list[-1],
-                gravity=(0, -20),
-                collision_type="shot"
+                gravity=(0, -100),
+                collision_type="shot",
+                moment_of_inertia=2**69 # bigger number than tobiases :) so me is cooler
             )
             self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
 
@@ -425,6 +426,8 @@ class GameOverView(arcade.View):
         """
         intro_view = IntroView()
         self.window.show_view(intro_view)
+
+
 
 
 def main():
