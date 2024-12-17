@@ -116,7 +116,10 @@ class GameView(arcade.View):
                 self.physics_engine.add_sprite(
                     sprite=b,
                     gravity=(0, 0),
-                    collision_type="balloon"
+                    collision_type="balloon",
+                    mass=10000,
+                    elasticity=0.36
+
                 )
                 self.physics_engine.set_velocity(b,(BALLON_SPEED*self.direction, 0))
             self.direction *= -1
@@ -167,7 +170,8 @@ class GameView(arcade.View):
         return balloons
 
     def balloon_death(self, balloon, player_shot, arbiter, space, _data):
-
+        balloon.kill()
+        return
         balloon.balloon_death_sequence()
 
 
@@ -205,6 +209,20 @@ class GameView(arcade.View):
             second_type="shot",
             post_handler=self.balloon_death
         )
+
+        for a in self.player_shot_list:
+            physics_object = self.physics_engine.get_physics_object(a)
+
+            velocity_x, velocity_y = physics_object.body.velocity
+
+            if a.center_x > SCREEN_WIDTH or a.center_x < 0:
+                self.physics_engine.set_velocity(a,(velocity_x *-1, velocity_y))
+            elif a.center_y > SCREEN_HEIGHT:
+                self.physics_engine.set_velocity(a, (velocity_x, velocity_y * -1))
+
+
+
+            #physics_object = self.
 
         # update balloon list
         for bl in self.balloons_list:
@@ -269,6 +287,7 @@ class GameView(arcade.View):
                 speed=PLAYER_SHOT_SPEED,
                 max_y_pos=SCREEN_HEIGHT,
                 scale=SPRITE_SCALING,
+
             )
 
             # Add the new shot to the list of shots
@@ -278,7 +297,11 @@ class GameView(arcade.View):
                 sprite=self.player_shot_list[-1],
                 gravity=(0, -100),
                 collision_type="shot",
-                moment_of_inertia=2**69 # bigger number than tobiases :) so me is cooler
+                moment_of_inertia=2**69,
+                elasticity=0.4,
+                mass=1
+
+
             )
             self.physics_engine.set_velocity(self.player_shot_list[-1], (0, PLAYER_SHOT_SPEED))
 

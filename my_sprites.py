@@ -54,7 +54,7 @@ class Acrobat(arcade.Sprite):
             center_x=center_x,
             center_y=center_y,
             scale=scale,
-            filename="images/Lasers/laserBlue01.png",
+            filename="images/Power-ups/powerupRed_star.png",
             flipped_diagonally=True,
             flipped_horizontally=True,
             flipped_vertically=False,
